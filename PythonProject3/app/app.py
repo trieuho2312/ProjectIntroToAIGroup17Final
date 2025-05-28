@@ -78,13 +78,15 @@ if option == "Gợi ý bài hát tương tự":
             # Tính toán độ tương đồng
             vec = recommender.vectorizer.transform([matched.iloc[0]["cleaned_text"]])
             distances, indices = recommender.nn_model.kneighbors(vec, n_neighbors=6)
-            similar_indices = indices[0][1:]
-            recommended_df = recommender.df.iloc[similar_indices]
+            recommended_df = recommender.df.iloc[indices[0][1:]]
             similarity_scores = 1 - distances[0][1:]
             song_titles = recommended_df["song"].tolist()
             avg_similarity = similarity_scores.mean()
-            match_count = sum(recommended_df["emotion"].str.lower() == original_emotion.lower())
-            emotion_match_rate = match_count / len(recommended_df)
+
+            # Tính Emotion Match Rate dựa trên danh sách gợi ý
+            total_shown = len(filtered_results) + len(other_results)
+            emotion_match_rate = (len(filtered_results) / total_shown) if total_shown > 0 else 0
+
 
             # Hiển thị gợi ý
             show_result_list("Các bài hát tương tự có cùng cảm xúc:", filtered_results)
